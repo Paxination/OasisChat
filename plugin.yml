@@ -1,0 +1,38 @@
+name: OasisChat
+main: net.charter.orion_pax.OasisChat.OasisChat
+version: Beta 1.0
+commands:
+  a:
+    description: Admin chat
+    usage:
+    permission: oasischat.staff
+    permission-message: You don't have permissions for <permission>
+    
+  p:
+    description: Party chat
+    usage:
+    permission: oasischat.players
+    permission-message: You don't have permissions for <permission>
+    
+  staff:
+    description:  Staff list
+    usage:
+    permission: oasischat.staff
+    permission-message: You don't have permissions for <permission>
+    
+  enableme:
+    description:  Funny broadcast message!
+    usage:
+    permission: oasischat.staff
+    permission-message: You don't have permissions for <permission>
+    
+  disableme:
+    description:  Funny broadcast message!
+    usage:
+    permission: oasischat.staff
+    permission-message: You don't have permissions for <permission>
+    
+  reloadchat:
+    description:  Reloads Chat config!
+    permission: oasischat.staff
+    permission-message: You don't have permissions for <permission>
