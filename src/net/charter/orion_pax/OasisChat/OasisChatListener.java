@@ -25,7 +25,7 @@ public class OasisChatListener implements Listener{
 		this.plugin = plugin;
 	}
 	
-	public static Economy economy = null;
+	/*public static Economy economy = null;
 	
 	@EventHandler(priority=EventPriority.NORMAL)
     public void onVotifierEvent(VotifierEvent event) {
@@ -43,7 +43,8 @@ public class OasisChatListener implements Listener{
 			player.sendMessage("Thanks for voting on " + vote.getServiceName() + "!");
 			player.sendMessage("100" + " has been added to your iConomy balance.");
 		}
-    }
+    }*/
+	
 	
 	@EventHandler
 	public void OnAsyncPlayerChat(AsyncPlayerChatEvent event) {
