@@ -1,38 +1,113 @@
 name: OasisChat
 main: net.charter.orion_pax.OasisChat.OasisChat
-version: Beta 1.0
+version: 1.5
+description: A player/staff chat system for bukkit servers!
+author: Paxination
 commands:
   a:
     description: Admin chat
     usage:
-    permission: oasischat.staff
+    permission: oasischat.staff.a
     permission-message: You don't have permissions for <permission>
     
   p:
     description: Party chat
     usage:
-    permission: oasischat.players
+    permission: oasischat.players.p
+    permission-message: You don't have permissions for <permission>
+    
+  party:
+    description: Party chat
+    usage:
+    permission: oasischat.players.party
     permission-message: You don't have permissions for <permission>
     
   staff:
     description:  Staff list
     usage:
-    permission: oasischat.staff
+    permission: oasischat.staff.staff
     permission-message: You don't have permissions for <permission>
     
   enableme:
     description:  Funny broadcast message!
     usage:
-    permission: oasischat.staff
+    permission: oasischat.staff.enableme
     permission-message: You don't have permissions for <permission>
     
   disableme:
     description:  Funny broadcast message!
     usage:
-    permission: oasischat.staff
+    permission: oasischat.staff.disableme
     permission-message: You don't have permissions for <permission>
     
-  reloadchat:
-    description:  Reloads Chat config!
-    permission: oasischat.staff
+  oasischat:
+    description:  Addition commands for oasischat!
+    permission: oasischat.staff.oasischat
     permission-message: You don't have permissions for <permission>
+    
+  brocast:
+    description: Broadcasts a msg with prefix [Brocast] instead of [Broadcast]
+    usage: "Usage: /<command> Your message here!"
+    permission: oasischat.staff.brocast
+    permission-message: You don't have permissions for <permission>
+    
+  spook:
+    description: Plays a sound effect at the specified player
+    usage: "Usage: /<command> playername [#1-10 optional]"
+    permission: oasischat.staff.spook
+    permission-message: You don't have permissions for <permission>
+    
+  freeze:
+    description: Freezes the player in their tracks.
+    usage: "Usage: /<command> playername"
+    permission: oasischat.staff.freeze
+    permission-message: You don't have permissions for <permission>
+    
+  drunk:
+    description: Makes players screen look like they are drunk!
+    usage: "Usage: /<command> playername [seconds (optional)]"
+    permission: oasischat.staff.drunk
+    permission-message: You don't have permissions for <permission>
+    
+  slap:
+    description: Slaps a player!
+    usage: "Usage: /<command> playername [any number for knockback effect (optional]"
+    permission: oasischat.staff.slap
+    permission-message: You don't have permissions for <permission>
+    
+permissions:
+    oasischat.staff.guide:
+        description: Gives access to all staff commands
+        children:
+            oasischat.staff.a: true
+            oasischat.staff.staff: true
+            oasischat.staff.spook: true
+            
+    oasischat.staff.mod:
+        description: Gives access to all staff commands
+        children:
+            oasischat.staff.enableme: true
+            oasischat.staff.disableme: true
+            oasischat.staff.brocast: true
+            oasischat.staff.freeze: true
+            oasischat.staff.drunk: true
+            oasischat.staff.slap: true
+            
+    oasischat.staff.dev:
+        description: Developer perks!
+        children:
+            oasischat.staff.enableme: true
+            oasischat.staff.disableme: true
+            oasischat.staff.brocast: true
+            oasischat.staff.freeze: true
+            oasischat.staff.drunk: true
+            oasischat.staff.slap: true
+            oasischat.staff.slap.all: true
+            oasischat.staff.oasischat: true
+            
+    oasischat.staff.admin:
+        description: Gives access to all staff commands
+        children:
+            oasischat.staff.reload: true
+            oasischat.staff.slap.all: true
+            oasischat.staff.oasischat: true
