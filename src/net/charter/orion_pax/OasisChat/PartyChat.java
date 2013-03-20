@@ -22,8 +22,8 @@ public class PartyChat {
 	 * @return 
 	 */
 	public List<String> getParties(){
-		if (plugin.getConfig().getConfigurationSection("partychats").getValues(false)==null){return null;}
-		List<String> parties = (List<String>) plugin.getConfig().getConfigurationSection("partychats").getValues(false);
+//		if (plugin.getConfig().getConfigurationSection("partychats").getValues(false)==null){return null;}
+		List<String> parties = (List<String>) plugin.getConfig().getList("partychatslist");
 		plugin.getLogger().info("parties is returned");
 		return parties;
 	}

@@ -49,14 +49,6 @@ public class OasisChat extends JavaPlugin {
 		getCommand("party").setExecutor(new OasisChatCommand(this));
 
 		setup();
-		if (!(this.getConfig().contains("partchats"))){
-			this.getConfig().createSection("partychats");
-			this.getConfig().createSection("partychats.Paxs_Nation");
-			this.getConfig().set("partychats.Paxs_Nation.owner", "Paxination");
-			this.getConfig().set("partychats.Paxs_Nation.password", "dc9285");
-			this.getConfig().set("partychats.Paxs_Nation.members", "");
-			this.saveConfig();
-		}
 
 		getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
 	}

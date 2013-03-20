@@ -8,3 +8,17 @@ ingameconfigurable:
 
 # players that are frozen, and left that way
 frozen:
+partychatslist:
+  - Paxs_Nation
+  - Bandits_bandits
+
+partychats:
+  Paxs_Nation:
+    owner: Paxination
+    password: dc9285
+    members: ''
+
+  Bandits_bandits:
+    owner: Bandityogo
+    password: ''
+    members: ''
