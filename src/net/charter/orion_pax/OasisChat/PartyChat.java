@@ -17,15 +17,12 @@ public class PartyChat {
 	public PartyChat(OasisChat plugin){
 		this.plugin = plugin;
 	}
-
-	public PartyChat(Player player){
-
-	}
 	
 	/**Method used to generate a list of available parties on the server!
 	 * @return 
 	 */
 	public List<String> getParties(){
+		if (plugin.getConfig().getConfigurationSection("partychats").getValues(false)==null){return null;}
 		List<String> parties = (List<String>) plugin.getConfig().getConfigurationSection("partychats").getValues(false);
 		plugin.getLogger().info("parties is returned");
 		return parties;
