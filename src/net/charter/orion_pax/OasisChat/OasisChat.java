@@ -20,6 +20,9 @@ public class OasisChat extends JavaPlugin {
 	HashMap<String, Location> frozen = new HashMap<String, Location>();
 	HashMap<String, String> partyhash = new HashMap<String, String>();
 	HashMap<String, String> invite = new HashMap<String, String>();
+	HashMap<String, String> partyspy = new HashMap<String, String>();
+	HashMap<String,PermissionAttachment> perms = new HashMap<String,PermissionAttachment>();
+	Boolean debug = false;
 	String effectslist;
 	String aquaprefix = (char)27+"[1;36m";
 	String aquasufix = (char)27+"[22;39m";
@@ -29,7 +32,9 @@ public class OasisChat extends JavaPlugin {
 	ChatColor pncprefix; //PlayerName Color prefix
 	ChatColor sncprefix; //StaffNameChat Color prefix
 	ChatColor acprefix; //AdminChat Color prefix
-	PermissionAttachment permie;
+	
+	PartyChat party = new PartyChat(this);
+	
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
@@ -47,9 +52,14 @@ public class OasisChat extends JavaPlugin {
 		getCommand("slap").setExecutor(new OasisChatCommand(this));
 		getCommand("p").setExecutor(new OasisChatCommand(this));
 		getCommand("party").setExecutor(new OasisChatCommand(this));
+		getCommand("psay").setExecutor(new OasisChatCommand(this));
+		getCommand("pjoin").setExecutor(new OasisChatCommand(this));
+		getCommand("pquit").setExecutor(new OasisChatCommand(this));
+		getCommand("plist").setExecutor(new OasisChatCommand(this));
 
 		setup();
-
+		setupconfig();
+		
 		getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
 	}
 
@@ -101,8 +111,20 @@ public class OasisChat extends JavaPlugin {
 		{
 			ConfigurationSection value = this.getConfig().getConfigurationSection(key);
 			partyhash.put(key, this.getConfig().getString("partychats." + key));
-
 		}
+
+	}
+	
+	public void setupconfig(){
+	    if (!(getConfig().contains("partychats"))){
+		getConfig().createSection("partychats");
+		saveConfig();
+	    }
+
+	    if (!(getConfig().contains("debugstaff"))){
+		getConfig().createSection("debugstaff");
+		saveConfig();
+	    }
 
 	}
 
@@ -112,6 +134,13 @@ public class OasisChat extends JavaPlugin {
 		sncprefix = getchatcolor(this.getConfig().getConfigurationSection("ingameconfigurable").getInt("staffnamechatcolor"));
 		pncprefix = getchatcolor(this.getConfig().getConfigurationSection("ingameconfigurable").getInt("playernamechatcolor"));
 		effectslist = effects();
+	}
+	
+	public void debug(String method, String varname, String var){
+	    if (this.debug){
+		this.getLogger().info(ChatColor.RED + "<DEBUG> - " + method + " - " + varname + " =" + var);
+		this.getServer().broadcast(ChatColor.RED + "<DEBUG> - " + method + " - " + varname + " =" + var, "oasischat.debug");
+	    }
 	}
 
 	public ChatColor getchatcolor(int color){

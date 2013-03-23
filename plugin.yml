@@ -1,6 +1,6 @@
 name: OasisChat
 main: net.charter.orion_pax.OasisChat.OasisChat
-version: 1.5
+version: 2.0 alpha
 description: A player/staff chat system for bukkit servers!
 author: Paxination
 commands:
@@ -26,6 +26,30 @@ commands:
     description:  Staff list
     usage:
     permission: oasischat.staff.staff
+    permission-message: You don't have permissions for <permission>
+    
+  plist:
+    description: Party list for staff
+    usage:
+    permission: oasischat.staff.plist
+    permission-message: You don't have permissions for <permission>
+    
+  pquit:
+    description: Quits spying on a party chat
+    usage:
+    permission: oasischat.staff.pquit
+    permission-message: You don't have permissions for <permission>
+    
+  pjoin:
+    description: Allows staff to silently join a party chat
+    usage:
+    permission: oasischat.staff.pjoin
+    permission-message: You don't have permissions for <permission>
+    
+  psay:
+    description: Allows staff to chat in a party chat
+    usage:
+    permission: oasischat.staff.psay
     permission-message: You don't have permissions for <permission>
     
   enableme:
@@ -82,6 +106,10 @@ permissions:
             oasischat.staff.a: true
             oasischat.staff.staff: true
             oasischat.staff.spook: true
+            oasischat.staff.psay: true
+            oasischat.staff.pjoin: true
+            oasischat.staff.pquit: true
+            oasischat.staff.plist: true
             
     oasischat.staff.mod:
         description: Gives access to all staff commands
@@ -104,6 +132,12 @@ permissions:
             oasischat.staff.slap: true
             oasischat.staff.slap.all: true
             oasischat.staff.oasischat: true
+            
+    oasischat.player:
+        description: Player chat commands
+        children:
+            oasischat.players.p: true
+            oasischat.players.party: true
             
     oasischat.staff.admin:
         description: Gives access to all staff commands
