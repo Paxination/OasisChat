@@ -1,7 +1,11 @@
 package net.charter.orion_pax.OasisChat;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +42,6 @@ public class PartyChat {
     public Set<String> getParties(){
 	if (plugin.getConfig().getConfigurationSection("partychats").getKeys(false)==null){return null;}
 	Set<String> parties = plugin.getConfig().getConfigurationSection("partychats").getKeys(false);
-	plugin.debug("getParties()", "parties",parties.toString());
 	return parties;
     }
 
@@ -51,8 +54,7 @@ public class PartyChat {
 	Set<String> parties = getParties();
 	if (parties==null){return false;}
 	for (String party : parties){
-	    plugin.debug("isOwner(Player player)", "party",party);
-	    if (plugin.getConfig().getString("partychats." + party + ".owner").contains(player.getName())){
+	    if (plugin.getConfig().getString("partychats." + party + ".owner").equals(player.getName())){
 		return true;
 	    }
 	}
@@ -66,7 +68,6 @@ public class PartyChat {
     public List<String> getMembers(String myparty){
 	List<String> members;
 	members = (List<String>) plugin.getConfig().getStringList("partychats." + myparty + ".members");
-	plugin.debug("getMembers(String myparty)", "members",members.toString());
 	return members;
     }
 
@@ -77,32 +78,42 @@ public class PartyChat {
     public boolean isMember(Player player){
 	List<String> members = getMembers(myParty(player));
 	for (String member : members){
-	    plugin.debug("isMember()", "member",member);
-	    if (member.contains(player.getName())){
+	    if (member.equals(player.getName())){
 		return true;
 	    }
 	}
 	return false;
     }
+
+    public void partyspydel(String myparty){
+	Iterator it = plugin.partyspy.entrySet().iterator();
+	while (it.hasNext()) {
+	    Map.Entry pairs = (Map.Entry)it.next();
+	    if (pairs.getValue()==myparty){
+		Player player = plugin.getServer().getPlayer(pairs.getKey().toString());
+		player.sendMessage(ChatColor.GREEN + myparty + " has been disbanded!");
+		return;
+	    }
+	    it.remove(); // avoids a ConcurrentModificationException
+	}
+    }
+
     /**Gets a list of members that are part of a party that are ONLINE!
      * @return returns a list of online users.
      */
-    public List<String> getOnlineMembers(Player player){
-	List<String> members = getMembers(myParty(player));
-	plugin.debug("getOnlineMembers(Player player)", "members",members.toString());
+    public List<String> getOnlineMembers(String myparty, Player player){
+	List<String> members = getMembers(myparty);
 	List<String> online = new ArrayList<String>();
-	online.add("ONLINE");
 	for (String member : members){
-	    plugin.debug("getOnlineMembers(Player player)", "member",member);
-	    if (plugin.getServer().getPlayer(member).isOnline()){
+	    if (plugin.getServer().getPlayer(member) != null){
 		if (!(player == plugin.getServer().getPlayer(member))) {
 		    online.add(member);
 		}
 	    }
 	}
-	plugin.debug("getOnlineMembers(Player player)", "online",online.toString());
 	return online;
     }
+
 
     /**Finds the party that a player/owner is part of.
      * @param player - Player player
@@ -112,11 +123,13 @@ public class PartyChat {
 	Set<String> parties = getParties();
 	if (parties==null){return null;}
 	for (String party : parties){
-	    plugin.debug("myParty(Player player)", "party",party);
-	    if (plugin.getConfig().getStringList("partychats." + party + ".members").contains(player.getName())){
-		return party;
+	    List<String> members = getMembers(party);
+	    for (String member : members){
+		if (member.equals(player.getName())){
+		    return party;
+		}
 	    }
-	    if (isOwner(player)){
+	    if (plugin.getConfig().getString("partychats." + party + ".owner").equals(player.getName())){
 		return party;
 	    }
 	}
@@ -128,8 +141,11 @@ public class PartyChat {
      * @return returns the password
      */
     public String getPassword(String myparty){
-	plugin.debug("getPassword(String myparty)", "myparty",myparty);
 	return plugin.getConfig().getString("partychats." + myparty + ".password");
+    }
+
+    public String getOwner(String myparty){
+	return plugin.getConfig().getString("partychats." + myparty + ".owner");
     }
 
 
@@ -147,7 +163,8 @@ public class PartyChat {
 	plugin.perms.get(oldowner.getName()).unsetPermission(plugin.partyhash.get(oldowner.getName()));
 	plugin.perms.get(newowner.getName()).setPermission(plugin.partyhash.get(oldowner.getName()), true);
 	plugin.getConfig().set("partychats." + myparty + ".owner", newowner.getName());
-	plugin.partyhash.remove(oldowner);
+	plugin.partyhash.put(newowner.getName(), plugin.partyhash.get(oldowner.getName()));
+	plugin.partyhash.remove(oldowner.getName());
 	plugin.saveConfig();
     }
 
@@ -192,14 +209,17 @@ public class PartyChat {
      */
     public void delParty(String myparty){
 	List<String> members = getMembers(myparty);
-	for (String member : members){
-	    plugin.debug("delParty(String myparty)", "member",member);
-	    Player player = plugin.getServer().getPlayer(member);
-	    plugin.perms.get(player.getName()).unsetPermission(plugin.partyhash.get(player.getName()));
-	    plugin.partyhash.remove(member);
+	if (members != null) {
+	    for (String member : members) {
+		Player player = plugin.getServer().getPlayer(member);
+		plugin.perms.get(player.getName()).unsetPermission(
+			plugin.partyhash.get(player.getName()));
+		plugin.partyhash.remove(member);
+	    }
 	}
 	String ownername = plugin.getConfig().getString("partychats." + myparty + ".owner");
-	plugin.getServer().getPlayer(ownername).addAttachment(plugin, plugin.partyhash.remove(ownername), false);
+	plugin.perms.get(ownername).unsetPermission(plugin.partyhash.get(ownername));
+	plugin.partyhash.remove(ownername);
 	plugin.getConfig().set("partychats." + myparty, null);
 	plugin.saveConfig();
     }
