@@ -1,6 +1,6 @@
 name: OasisChat
 main: net.charter.orion_pax.OasisChat.OasisChat
-version: 2.0 alpha
+version: 2.0 beta
 description: A player/staff chat system for bukkit servers!
 author: Paxination
 commands:
@@ -62,6 +62,10 @@ commands:
     description:  Addition commands for oasischat!
     permission: oasischat.staff.oasischat
     permission-message: You don't have permissions for <permission>
+    
+  credits:
+    description: List of beta testers
+    permission: oasischat.players.credits
         
 permissions:
     oasischat.staff.*:
@@ -85,3 +89,4 @@ permissions:
         children:
             oasischat.players.p: true
             oasischat.players.party: true
+            oasischat.players.credits: true

@@ -1,8 +1,8 @@
 # default config
-# chatcolors 0-9 are equal to normal mc chat colors, 10=a, 11=b, 12=c, 13=d, 14=e, 15=f
+# chatcolors are equal to normal mc chat colors.
 ingameconfigurable:
-  adminchatcolor: 11
-  partychatcolor: 10
-  staffnamechatcolor: 15
-  playernamechatcolor: 15
+  adminchatcolor: '&b'
+  partychatcolor: '&a'
+  staffnamechatcolor: '&f'
+  playernamechatcolor: '&f'
 
