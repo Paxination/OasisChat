@@ -171,10 +171,16 @@ public class PartyChat {
 	 */
 	public void addMember(Player player, String myparty){
 		List<String> members = getMembers(myparty);
-		members.add(player.getName());
-		plugin.getConfig().set("partychats." + myparty + ".members", members);
-		plugin.partyhash.put(player.getName(), "oasischat.party." + myparty);
-		plugin.perms.get(player.getName()).setPermission(plugin.partyhash.get(player.getName()), true);
+		
+		if ((!members.contains(player.getName())) && (!this.isOwner(player))) {
+			members.add(player.getName());
+			plugin.getConfig().set("partychats." + myparty + ".members",
+					members);
+			plugin.partyhash
+					.put(player.getName(), "oasischat.party." + myparty);
+			plugin.perms.get(player.getName()).setPermission(
+					plugin.partyhash.get(player.getName()), true);
+		}
 	}
 
 	/**Deletes member from a party.  Only removes members.  Does not verify owner.
@@ -191,6 +197,7 @@ public class PartyChat {
 					plugin.partyhash.get(player.getName()));
 		}
 		plugin.partyhash.remove(player.getName());
+		plugin.partychattoggle.put(player.getName(), "off");
 	}
 
 	/**Deletes a party and notifies ALL members/owner of disbanded party!  Does not check for owner.

@@ -79,11 +79,6 @@ permissions:
             oasischat.staff.listparties: true
             oasischat.staff.partyinfo: true
             
-    oasischat.staff.dev:
-        description: Developer perks!
-        children:
-            oasischat.staff.oasischat: true
-            
     oasischat.player:
         description: Player chat commands
         children:

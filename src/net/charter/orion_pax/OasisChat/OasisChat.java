@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 
+import net.charter.orion_pax.OasisChat.Commands.*;
+
 import org.apache.commons.*;
 
 import org.bukkit.Bukkit;
@@ -30,24 +32,25 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class OasisChat extends JavaPlugin {
 
-	ConsoleCommandSender console;
-	ConcurrentHashMap<String, String> adminchattoggle = new ConcurrentHashMap<String, String>();
-	ConcurrentHashMap<String, String> partychattoggle = new ConcurrentHashMap<String, String>();
-	HashMap<String, String> partyhash = new HashMap<String, String>();
-	HashMap<String, String> invite = new HashMap<String, String>();
-	HashMap<String, String> partyspy = new HashMap<String, String>();
-	HashMap<String,PermissionAttachment> perms = new HashMap<String,PermissionAttachment>();
+	public ConsoleCommandSender console;
+	public HashMap<String, String> adminchattoggle = new HashMap<String, String>();
+	public HashMap<String, String> partychattoggle = new HashMap<String, String>();
+	public HashMap<String, String> partyhash = new HashMap<String, String>();
+	public HashMap<String, String> invite = new HashMap<String, String>();
+	public HashMap<String, String> partyspy = new HashMap<String, String>();
+	public HashMap<String,PermissionAttachment> perms = new HashMap<String,PermissionAttachment>();
 	String aquaprefix = (char)27+"[1;36m";
 	String aquasufix = (char)27+"[22;39m";
 	String greenprefix = (char)27+"[1;32m";
 	String greensufix = (char)27+"[22;39m";
-	static String pcprefix; //PartyChat Color prefix
-	static String pncprefix; //PlayerName Color prefix
-	static String sncprefix; //StaffNameChat Color prefix
-	static String acprefix; //AdminChat Color prefix
+	public static String pcprefix; //PartyChat Color prefix
+	public static String pncprefix; //PlayerName Color prefix
+	public static String sncprefix; //StaffNameChat Color prefix
+	public static String acprefix; //AdminChat Color prefix
+	public boolean disable = false;
 	File file = new File("plugins/OasisChat/paxserrorlog.txt");
 
-	PartyChat party = new PartyChat(this);
+	public PartyChat party = new PartyChat(this);
 	OasisChatListener ChatListener = new OasisChatListener(this);
 
 	@Override
@@ -57,17 +60,17 @@ public class OasisChat extends JavaPlugin {
 			setupconfig();
 			setup();
 			Bukkit.getPluginManager().registerEvents(new OasisChatListener(this), this);
-			getCommand("a").setExecutor(new OasisChatCommand(this));
-			getCommand("staff").setExecutor(new OasisChatCommand(this));
+			getCommand("a").setExecutor(new ACommand(this));
+			getCommand("staff").setExecutor(new StaffCommand(this));
 			getCommand("oasischat").setExecutor(new OasisChatCommand(this));
-			getCommand("p").setExecutor(new OasisChatCommand(this));
-			getCommand("party").setExecutor(new OasisChatCommand(this));
-			getCommand("psay").setExecutor(new OasisChatCommand(this));
-			getCommand("pspyon").setExecutor(new OasisChatCommand(this));
-			getCommand("pspyoff").setExecutor(new OasisChatCommand(this));
-			getCommand("listparties").setExecutor(new OasisChatCommand(this));
-			getCommand("partyinfo").setExecutor(new OasisChatCommand(this));
-			getCommand("credits").setExecutor(new OasisChatCommand(this));
+			getCommand("p").setExecutor(new PCommand(this));
+			getCommand("party").setExecutor(new PartyCommand(this));
+			getCommand("psay").setExecutor(new PsayCommand(this));
+			getCommand("pspyon").setExecutor(new PspyonCommand(this));
+			getCommand("pspyoff").setExecutor(new PspyoffCommand(this));
+			getCommand("listparties").setExecutor(new ListpartiesCommand(this));
+			getCommand("partyinfo").setExecutor(new PartyinfoCommand(this));
+			getCommand("credits").setExecutor(new CreditsCommand(this));
 			console = Bukkit.getServer().getConsoleSender();
 			partytask.runTaskTimer(this, 10, 12000);
 			getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
@@ -130,7 +133,7 @@ public class OasisChat extends JavaPlugin {
 		}
 	};
 
-	BukkitRunnable partytask = new BukkitRunnable(){
+	public BukkitRunnable partytask = new BukkitRunnable(){
 		@Override
 		public void run(){
 			boolean needreset = false;
