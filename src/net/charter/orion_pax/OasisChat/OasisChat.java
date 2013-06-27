@@ -2,31 +2,14 @@ package net.charter.orion_pax.OasisChat;
 
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
-
 import net.charter.orion_pax.OasisChat.Commands.*;
 
-import org.apache.commons.*;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 
 
@@ -55,29 +38,24 @@ public class OasisChat extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		try {
-			this.saveDefaultConfig();
-			setupconfig();
-			setup();
-			Bukkit.getPluginManager().registerEvents(new OasisChatListener(this), this);
-			getCommand("a").setExecutor(new ACommand(this));
-			getCommand("staff").setExecutor(new StaffCommand(this));
-			getCommand("oasischat").setExecutor(new OasisChatCommand(this));
-			getCommand("p").setExecutor(new PCommand(this));
-			getCommand("party").setExecutor(new PartyCommand(this));
-			getCommand("psay").setExecutor(new PsayCommand(this));
-			getCommand("pspyon").setExecutor(new PspyonCommand(this));
-			getCommand("pspyoff").setExecutor(new PspyoffCommand(this));
-			getCommand("listparties").setExecutor(new ListpartiesCommand(this));
-			getCommand("partyinfo").setExecutor(new PartyinfoCommand(this));
-			getCommand("credits").setExecutor(new CreditsCommand(this));
-			console = Bukkit.getServer().getConsoleSender();
-			partytask.runTaskTimer(this, 10, 12000);
-			getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
-		} catch (Throwable e) {
-
-			printStackTrace(e, "OnEnable");
-		}
+		this.saveDefaultConfig();
+		setupconfig();
+		setup();
+		Bukkit.getPluginManager().registerEvents(new OasisChatListener(this), this);
+		getCommand("a").setExecutor(new ACommand(this));
+		getCommand("staff").setExecutor(new StaffCommand(this));
+		getCommand("oasischat").setExecutor(new OasisChatCommand(this));
+		getCommand("p").setExecutor(new PCommand(this));
+		getCommand("party").setExecutor(new PartyCommand(this));
+		getCommand("psay").setExecutor(new PsayCommand(this));
+		getCommand("pspyon").setExecutor(new PspyonCommand(this));
+		getCommand("pspyoff").setExecutor(new PspyoffCommand(this));
+		getCommand("listparties").setExecutor(new ListpartiesCommand(this));
+		getCommand("partyinfo").setExecutor(new PartyinfoCommand(this));
+		getCommand("credits").setExecutor(new CreditsCommand(this));
+		console = Bukkit.getServer().getConsoleSender();
+		partytask.runTaskTimer(this, 10, 12000);
+		getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
 	}
 
 	@Override
@@ -98,32 +76,6 @@ public class OasisChat extends JavaPlugin {
 		pcprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("partychatcolor");
 		sncprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("staffnamechatcolor");
 		pncprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("playernamechatcolor");
-	}
-
-	void printStackTrace(Throwable t, String cmd){
-		try {
-			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss,a");
-			Date date = new Date();
-			if (!file.exists()){file.createNewFile();}
-			StringWriter sw = new StringWriter();
-			PrintWriter out = new PrintWriter(new FileWriter(file, true));
-			PrintWriter pw = new PrintWriter(sw);
-			out.println("**BEGIN**");
-			out.println("OasisChat");
-			out.println(dateFormat.format(date));
-			out.println(cmd);
-			t.printStackTrace(pw);
-			for(String l: sw.toString().replace("\r", "").split("\n")){
-				out.println(l);
-				getServer().broadcast(l, "oasis.debug");
-			}
-			pw.close();
-			out.println("**END**");
-			out.close();
-			sw.close();
-		} catch (IOException e) {
-
-		}
 	}
 	
 	BukkitRunnable partychat = new BukkitRunnable(){
