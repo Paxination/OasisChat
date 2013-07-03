@@ -56,6 +56,7 @@ public class PartyCommand implements CommandExecutor {
 				}
 				plugin.MyParties.put(args[1], new Parties(plugin, name, args[1], password, null));
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix)+ args[1]+ " has been created!");
+				plugin.partyconfig.saveConfig();
 				return true;
 			} else {
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix)+ "Usage: /party create <partyname> <password> (password is optional)");
@@ -67,10 +68,12 @@ public class PartyCommand implements CommandExecutor {
 				plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + myparty + " is disbanded!");
 				plugin.MyParties.get(myparty).removeMembers();
 				plugin.partyPlayer.get(name).removeParty();
+				plugin.partyconfig.saveConfig();
 				
 			} else if (plugin.partyPlayer.get(name).getMyParty()!=null) {
 				plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + name+ " has left chat!");
 				plugin.MyParties.get(myparty).removeMember(name);
+				plugin.partyconfig.saveConfig();
 			} else {
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "You are not in a party!");
 				return true;
@@ -87,6 +90,7 @@ public class PartyCommand implements CommandExecutor {
 					if (plugin.MyParties.get(args[1]).getPassword().equals(password)) {
 						plugin.MyParties.get(args[1]).addMember(name);
 						plugin.MyParties.get(args[1]).sendMessage(plugin.pcprefix + name + " has joined " + args[1] + "!");
+						plugin.partyconfig.saveConfig();
 					} else {
 						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "Incorrect password!");
 					}
@@ -110,6 +114,7 @@ public class PartyCommand implements CommandExecutor {
 							if (plugin.MyParties.get(myparty).getMembers().contains(otarget.getName())) {
 								plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + otarget.getName() + " has been kicked from " + myparty + "!");
 								plugin.MyParties.get(myparty).removeMember(otarget.getName());
+								plugin.partyconfig.saveConfig();
 								return true;
 							} else {
 								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + plugin.getServer().getOfflinePlayer(args[1]).getName() + " is not a member of your party!"));
@@ -120,6 +125,7 @@ public class PartyCommand implements CommandExecutor {
 							if (plugin.MyParties.get(myparty).getMembers().contains(target.getName())) {
 								plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + target.getName() + " has been kicked from " + myparty + "!");
 								plugin.MyParties.get(myparty).removeMember(target.getName());
+								plugin.partyconfig.saveConfig();
 								return true;
 							} else {
 								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + target.getName() + " is not a member of your party!");
@@ -177,6 +183,7 @@ public class PartyCommand implements CommandExecutor {
 				plugin.MyParties.get(plugin.partyPlayer.get(name).getInvite()).addMember(name);
 				plugin.MyParties.get(plugin.partyPlayer.get(name).getInvite()).sendMessage(plugin.pcprefix + name + " has joined " + plugin.partyPlayer.get(name).getInvite() + "!");
 				plugin.partyPlayer.get(name).setInvite("");
+				plugin.partyconfig.saveConfig();
 				return true;
 			}
 		}
@@ -188,6 +195,7 @@ public class PartyCommand implements CommandExecutor {
 				} else if ((!(plugin.MyParties.get(target.getName()).isOwner(target.getName()))) || (!(plugin.MyParties.get(target.getName()).getMembers().contains(target.getName())))) {
 					plugin.MyParties.get(myparty).changeOwner(target.getName());
 					plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + "Ownership has been given to " + target.getName() + "!");
+					plugin.partyconfig.saveConfig();
 					return true;
 				} else {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "They are already part of a party!"));
@@ -202,6 +210,7 @@ public class PartyCommand implements CommandExecutor {
 			if (args.length == 2) {
 				if (plugin.MyParties.get(myparty).isOwner(name)) {
 					plugin.MyParties.get(myparty).changePassword(args[1]);
+					plugin.partyconfig.saveConfig();
 					return true;
 				} else {
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "You are not an owner of a party!");

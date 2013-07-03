@@ -80,6 +80,7 @@ public class OasisChat extends JavaPlugin {
 	@Override
 	public void onDisable(){
 		this.saveConfig();
+		this.partyconfig.saveConfig();
 		getLogger().info(aquaprefix+"OasisChat has been disabled!"+aquasufix);
 	}
 
