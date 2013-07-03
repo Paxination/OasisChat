@@ -17,9 +17,8 @@ public class PspyoffCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		plugin.perms.get(sender.getName()).unsetPermission("oasischat.party."+ plugin.partyspy.get(sender.getName()));
-		plugin.partyspy.remove(sender.getName());
-		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix)+ "You have stopped spying!");
+		plugin.partyPlayer.get(sender.getName()).setPartySpyChat("");
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "You have stopped spying!"));
 		return true;
 	}
 }

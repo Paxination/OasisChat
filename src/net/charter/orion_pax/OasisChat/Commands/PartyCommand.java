@@ -1,13 +1,22 @@
 package net.charter.orion_pax.OasisChat.Commands;
 
+import java.awt.List;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.charter.orion_pax.OasisChat.OasisChat;
+import net.charter.orion_pax.OasisChat.Parties;
+import net.charter.orion_pax.OasisChat.PartyPlayer;
 
 public class PartyCommand implements CommandExecutor {
 
@@ -16,220 +25,227 @@ public class PartyCommand implements CommandExecutor {
 	public PartyCommand(OasisChat plugin){
 		this.plugin = plugin;
 	}
-	
-	CommandHelp helper = new CommandHelp(plugin);
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (args.length == 0) {
-			sender.sendMessage(helper.partychatsub);
+			sender.sendMessage(plugin.partychatsub);
 			return true;
 		}
+		
+		Player player = (Player) sender;
+		String myparty = plugin.partyPlayer.get(player.getName()).getMyParty();
+		String name = player.getName();
 		String password = "";
+		
 		if (args[0].equalsIgnoreCase("create")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
 			if (args.length > 1) {
 				if (args.length == 3) {
 					password = args[2];
 				}
-				if (plugin.party.isOwner(player)) {
-					plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + myparty + " disbanded!",plugin.partyhash.get(player.getName()));
-					plugin.party.delParty(myparty);
-				} else if (plugin.party.isMember(player)) {
-					plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&',OasisChat.pcprefix)+ player.getName()+ " has left chat!",plugin.partyhash.get(player.getName()));
-					plugin.party.delMember(player.getName(), myparty);
+				if (myparty!=null) {
+					if (plugin.MyParties.get(myparty).isOwner(name)) {
+						plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + myparty + " is disbanded!");
+						plugin.MyParties.get(myparty).removeMembers();
+						plugin.partyPlayer.get(name).removeParty();
+
+					} else if (plugin.partyPlayer.get(name).getMyParty() != null) {
+						plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + name + " has left chat!");
+						plugin.MyParties.get(myparty).removeMember(name);
+					}
 				}
-				plugin.party.createParty(player,args[1], password);
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix)+ args[1]+ " has been created!");
+				plugin.MyParties.put(args[1], new Parties(plugin, name, args[1], password, null));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix)+ args[1]+ " has been created!");
 				return true;
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix)+ "Usage: /party create <partyname> <password> (password is optional)");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix)+ "Usage: /party create <partyname> <password> (password is optional)");
 				return true;
 			}
 		}
 		if (args[0].equalsIgnoreCase("quit")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
-			if (plugin.party.isOwner(player)) {
-				plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + myparty + " disbanded!", plugin.partyhash.get(player.getName()));
-				plugin.party.partyspydel(myparty);
-				plugin.party.delParty(myparty);
-			} else if (plugin.party.isMember(player)) {
-				plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + player.getName() + " has left chat!", plugin.partyhash.get(player.getName()));
-				plugin.party.delMember(player.getName(), myparty);
+			if (plugin.MyParties.get(myparty).isOwner(name)) {
+				plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + myparty + " is disbanded!");
+				plugin.MyParties.get(myparty).removeMembers();
+				plugin.partyPlayer.get(name).removeParty();
+				
+			} else if (plugin.partyPlayer.get(name).getMyParty()!=null) {
+				plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + name+ " has left chat!");
+				plugin.MyParties.get(myparty).removeMember(name);
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "You are not in a party!");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "You are not in a party!");
 				return true;
 			}
 			return false;
 		}
 		if (args[0].equalsIgnoreCase("join")) {
-			Player player = (Player) sender;
-			
 			if (args.length > 1) {
 				if (args.length == 3) {
 					password = args[2];
 				}
-				if (plugin.party.getParties().toString().contains(args[1])) {
-					if (plugin.party.getPassword(args[1]).equals(password)) {
-						plugin.party.addMember(player, args[1]);
-						plugin.partyhash.put(player.getName(), "oasischat.party." + args[1]);
-						player.addAttachment(plugin, "oasischat.party." + args[1], true);
-						plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + player.getName() + " has joined " + args[1] + "!", "oasischat.party." + args[1]);
+				Set<String> parties = plugin.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
+				if (parties.contains(args[1])) {
+					if (plugin.MyParties.get(args[1]).getPassword().equals(password)) {
+						plugin.MyParties.get(args[1]).addMember(name);
+						plugin.MyParties.get(args[1]).sendMessage(plugin.pcprefix + name + " has joined " + args[1] + "!");
 					} else {
-						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Incorrect password!");
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "Incorrect password!");
 					}
 				} else {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "The party " + args[1] + " does not exist!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&',plugin.pcprefix) + "The party " + args[1] + " does not exist!");
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Usage: /party join <partyname> <password> (password optional)");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "Usage: /party join <partyname> <password> (password optional)");
 				return true;
 			}
 			return false;
 		}
 		if (args[0].equalsIgnoreCase("kick")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
-
 			if (args.length > 1) {
-				Player target = plugin.getServer().getPlayer(args[1]);
-				if (target == null) {
+				if (plugin.MyParties.get(myparty).isOwner(name)) {
 					if (plugin.getServer().getPlayer(args[1]).hasPlayedBefore()) {
-						OfflinePlayer otarget = plugin.getServer().getOfflinePlayer(args[1]);
-						if (plugin.party.isMember((Player) otarget)) {
-							plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + otarget.getName() + " has been kicked from " + myparty + "!", plugin.partyhash.get(player.getName()));
-							plugin.party.delMember(otarget.getName(), myparty);
+						Player target = plugin.getServer().getPlayer(args[1]);
+						if (target == null) {
+							OfflinePlayer otarget = plugin.getServer().getOfflinePlayer(args[1]);
+							if (plugin.MyParties.get(myparty).getMembers().contains(otarget.getName())) {
+								plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + otarget.getName() + " has been kicked from " + myparty + "!");
+								plugin.MyParties.get(myparty).removeMember(otarget.getName());
+								return true;
+							} else {
+								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + plugin.getServer().getOfflinePlayer(args[1]).getName() + " is not a member of your party!"));
+								return true;
+							}
+						}
+						if (target != null) {
+							if (plugin.MyParties.get(myparty).getMembers().contains(target.getName())) {
+								plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + target.getName() + " has been kicked from " + myparty + "!");
+								plugin.MyParties.get(myparty).removeMember(target.getName());
+								return true;
+							} else {
+								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + target.getName() + " is not a member of your party!");
+								return true;
+							}
 						} else {
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + plugin.getServer().getOfflinePlayer(args[1]).getName() + " is not a member of your party!");
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + args[1] + " is not online!");
 							return true;
 						}
-					}
-				}
-				if (target != null) {
-					if (plugin.party.isOwner(player)) {
-						if (plugin.party.isMember(target)) {
-							plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + target.getName() + " has been kicked from " + myparty + "!", plugin.partyhash.get(player.getName()));
-							plugin.party.delMember(target.getName(), myparty);
-						} else {
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + target.getName() + " is not a member of your party!");
-							return true;
-						}
-					} else {
-						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "You're not the party owner!");
 					}
 				} else {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + args[1] + " is not online!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "You are not the owner of this party!"));
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Usage: /party kick <playername>");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "Usage: /party kick <playername>");
 				return true;
 			}
 			return false;
 		}
 		if (args[0].equalsIgnoreCase("invite")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
-
 			if (args.length > 1) {
 				Player target = plugin.getServer().getPlayer(args[1]);
 				if (target == null) {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + args[1] + " is not online!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + args[1] + " is not online!");
 					return true;
 				}
-				if (plugin.party.isMember(target)) {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + target.getName() + " is allready a member of a party!");
+				if (plugin.MyParties.get(myparty).getMembers().contains(target.getName())) {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + target.getName() + " is allready a member of a party!");
 					return true;
 				}
-				if (target.isOnline() && (plugin.party.isOwner(player))) {
-					plugin.invite.put(target.getName(), myparty);
+				if (target.isOnline() && (plugin.MyParties.get(myparty).isOwner(name))) {
+					plugin.partyPlayer.get(target.getName()).setInvite(myparty);
 					timer(target);
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + target.getName() + " has been invited to " + myparty + "!");
-					target.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + sender.getName() + " has invited you to " + myparty + "!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + target.getName() + " has been invited to " + myparty + "!"));
+					target.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + sender.getName() + " has invited you to " + myparty + "!"));
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Usage: /party invite <playername>");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "Usage: /party invite <playername>");
 				return true;
 			}
 		}
 		if (args[0].equalsIgnoreCase("accept")) {
-			Player player = (Player) sender;
-
-			if (plugin.party.isMember(player)) {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "You must leave your current party first!");
+			if (plugin.MyParties.get(myparty).getMembers().contains(name)) {
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "You must leave your current party first!"));
 				return true;
-			} else if (plugin.party.isOwner(player)) {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "You must leave your current party first!");
+			} else if (plugin.MyParties.get(myparty).isOwner(name)) {
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "You must leave your current party first!"));
 				return true;
-			} else if (!(plugin.invite.containsKey(player.getName()))) {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "You have no invitations pending!");
+			} else if (!(plugin.partyPlayer.get(name).getInvite().equals(""))) {
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "You have no invitations pending!"));
 				return true;
 			} else {
-				plugin.party.addMember(player, plugin.invite.get(player.getName()));
-				plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + player.getName() + " has joined " + plugin.invite.get(player.getName()) + "!", plugin.partyhash.get(player.getName()));
-				plugin.invite.remove(player.getName());
+				plugin.MyParties.get(plugin.partyPlayer.get(name).getInvite()).addMember(name);
+				plugin.MyParties.get(plugin.partyPlayer.get(name).getInvite()).sendMessage(plugin.pcprefix + name + " has joined " + plugin.partyPlayer.get(name).getInvite() + "!");
+				plugin.partyPlayer.get(name).setInvite("");
 				return true;
 			}
 		}
 		if (args[0].equalsIgnoreCase("give")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
-
 			if (args.length == 2) {
 				Player target = plugin.getServer().getPlayer(args[1]);
 				if (target == null) {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + args[1] + " is not online!");
-				} else if ((!(plugin.party.isOwner(target))) || (!(plugin.party.isMember(target)))) {
-					plugin.party.setOwner(target, player, myparty);
-					plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Ownership has been given to " + target.getName() + "!", plugin.partyhash.get(target.getName()));
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Ownership was been transfered!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + args[1] + " is not online!");
+				} else if ((!(plugin.MyParties.get(target.getName()).isOwner(target.getName()))) || (!(plugin.MyParties.get(target.getName()).getMembers().contains(target.getName())))) {
+					plugin.MyParties.get(myparty).changeOwner(target.getName());
+					plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + "Ownership has been given to " + target.getName() + "!");
 					return true;
 				} else {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "They are already part of a party!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "They are already part of a party!"));
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Usage: /party give <playername>");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Usage: /party give <playername>"));
 				return true;
 			}
 		}
 		if (args[0].equalsIgnoreCase("password")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
-			
 			if (args.length == 2) {
-				if (plugin.party.isOwner(player)) {
-					plugin.party.setPassword(player, args[1], myparty);
+				if (plugin.MyParties.get(myparty).isOwner(name)) {
+					plugin.MyParties.get(myparty).changePassword(args[1]);
 					return true;
 				} else {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "You are not an owner of a party!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "You are not an owner of a party!");
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Usage: /party password <newpassword>");
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + "Usage: /party password <newpassword>");
 			}
 		}
 		if (args[0].equalsIgnoreCase("list")) {
-			Player player = (Player) sender;
-			String myparty = plugin.party.myParty(player);
-
-			if (plugin.party.isMember(player)) {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Members: " + plugin.party.getMembers(myparty));
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Online: " + plugin.party.getOnlineMembers(myparty, player).toString());
+			if (plugin.MyParties.get(myparty).getMembers().contains(name)) {
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Owner: " + plugin.MyParties.get(myparty).getOwner()));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Members: " + plugin.MyParties.get(myparty).getMembers()));
+				Iterator it = plugin.partyPlayer.entrySet().iterator();
+				List mlist = null;
+				while (it.hasNext()){
+					Map.Entry entry = (Map.Entry)it.next();
+					PartyPlayer partyplayer = (PartyPlayer) entry.getValue();
+					if (partyplayer.getMyParty().equals(myparty)){
+						mlist.add(partyplayer.getName());
+					}
+					it.remove();
+				}
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Online: " + mlist));
 				return true;
-			} else if (plugin.party.isOwner(player)) {
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "PartyChat: " + myparty);
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Password: " + plugin.party.getPassword(myparty));
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Members: " + plugin.party.getMembers(myparty).toString());
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + "Online: " + plugin.party.getOnlineMembers(myparty, player).toString());
+			} else if (plugin.MyParties.get(myparty).isOwner(name)) {
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "PartyChat: " + myparty));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Password: " + plugin.MyParties.get(myparty).getPassword()));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Members: " + plugin.MyParties.get(myparty).getMembers()));
+				Iterator it = plugin.partyPlayer.entrySet().iterator();
+				List mlist = null;
+				while (it.hasNext()){
+					Map.Entry entry = (Map.Entry)it.next();
+					PartyPlayer partyplayer = (PartyPlayer) entry.getValue();
+					if (partyplayer.getMyParty().equals(myparty)){
+						mlist.add(partyplayer.getName());
+					}
+					it.remove();
+				}
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Online: " + mlist));
 				return true;
 			}
 		}
-		sender.sendMessage(helper.partychatsub);
+		sender.sendMessage(plugin.partychatsub);
 		return false;
 	}
 	
@@ -238,10 +254,9 @@ public class PartyCommand implements CommandExecutor {
 		{
 			public void run()
 			{
-				plugin.invite.remove(player.getName());
+				plugin.partyPlayer.get(player.getName()).setInvite("");
 			}
 		}
 		, 6000);
 	}
-	
 }

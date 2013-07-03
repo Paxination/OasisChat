@@ -19,26 +19,32 @@ public class PCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player player = (Player) sender;
-		String myparty = plugin.party.myParty(player);
+		String name = player.getName();
+		String myparty = null;
+		if (plugin.partyPlayer.containsKey(name)){
+			myparty = plugin.partyPlayer.get(name).getMyParty();
+		}
+		String pcprefix = plugin.pcprefix;
+		String pncprefix = plugin.pncprefix;
 		
 		if (args.length == 0) {
 			if (sender instanceof Player) {
 				if (myparty == null) {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&',OasisChat.pcprefix)+ "You're not part of a party chat!");
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&',plugin.pcprefix)+ "You're not part of a party chat!");
 					return true;
 				}
-				if (plugin.partychattoggle.get(sender.getName()) != "off") {
+				if (plugin.partyPlayer.get(name).getPToggle()) {
 
-					plugin.partychattoggle.put(sender.getName(),"off");
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix)+ "Playerchat "+ ChatColor.RED+ "DISABLED");
+					plugin.partyPlayer.get(name).setPToggle(false);
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix+ "Playerchat "+ ChatColor.RED+ "DISABLED"));
 				} else {
-					plugin.partychattoggle.put(sender.getName(),myparty);
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&',OasisChat.pcprefix)+ "Playerchat "+ ChatColor.GREEN+ "ENABLED");
+					plugin.partyPlayer.get(name).setPToggle(true);
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&',plugin.pcprefix+ "Playerchat "+ ChatColor.GREEN+ "ENABLED"));
 				}
 			}
 		} else {
-			if (plugin.partyhash.containsKey(sender.getName())) {
-				String prefix = ChatColor.translateAlternateColorCodes('&',OasisChat.pcprefix)+ "<"+ ChatColor.translateAlternateColorCodes('&', OasisChat.pncprefix)+ myparty+ ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix)+ "> - "+ ChatColor.translateAlternateColorCodes('&', OasisChat.pncprefix)+ sender.getName()+ ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + ": ";
+			if (myparty!=null) {
+				String prefix = pcprefix + "<" + pncprefix + myparty + pcprefix + "> - " + pncprefix + sender.getName() + pcprefix + ": ";
 				StringBuffer buffer = new StringBuffer();
 				buffer.append(args[0]);
 
@@ -48,8 +54,8 @@ public class PCommand implements CommandExecutor {
 				}
 
 				String message = buffer.toString();
-				plugin.console.sendMessage(prefix + message);
-				plugin.getServer().broadcast(prefix + ChatColor.translateAlternateColorCodes('&', message),plugin.partyhash.get(sender.getName()));
+				plugin.console.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + message));
+				plugin.MyParties.get(myparty).sendMessage(prefix + message);
 			}
 		}
 		return false;

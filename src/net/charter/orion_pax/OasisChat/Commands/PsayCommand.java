@@ -17,8 +17,11 @@ public class PsayCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (plugin.partyspy.containsKey(sender.getName())) {
-			String prefix = ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix)+ "<"+ ChatColor.translateAlternateColorCodes('&',OasisChat.pncprefix)+ plugin.partyspy.get(sender.getName())+ ChatColor.translateAlternateColorCodes('&',OasisChat.pcprefix)+ "> - "+ ChatColor.translateAlternateColorCodes('&',OasisChat.pncprefix)+ sender.getName()+ ChatColor.translateAlternateColorCodes('&',OasisChat.pcprefix) + ": ";
+		String pcprefix = plugin.pcprefix;
+		String pncprefix = plugin.pncprefix;
+		String acprefix = plugin.acprefix;
+		if (plugin.partyPlayer.get(sender.getName()).getPartySpyChat()!="") {
+			String prefix = pcprefix + "<" + pncprefix + plugin.partyPlayer.get(sender.getName()).getPartySpyChat() + pcprefix + "> - " + acprefix + sender.getName() + pcprefix + ": ";
 			StringBuffer buffer = new StringBuffer();
 			buffer.append(args[0]);
 
@@ -29,7 +32,7 @@ public class PsayCommand implements CommandExecutor {
 
 			String message = buffer.toString();
 			plugin.console.sendMessage(prefix + message);
-			plugin.getServer().broadcast(prefix + message,"oasischat.party."+ plugin.partyspy.get(sender.getName()));
+			plugin.MyParties.get(plugin.partyPlayer.get(sender.getName()).getPartySpyChat()).sendMessage(prefix + message);
 		}
 		return false;
 	}

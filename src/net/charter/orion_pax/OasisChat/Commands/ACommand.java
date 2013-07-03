@@ -18,25 +18,22 @@ public class ACommand implements CommandExecutor {
 
 			@Override
 			public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+				String name = sender.getName();
+				String acprefix = plugin.acprefix;
+				String sncprefix = plugin.sncprefix;
+				
 				if (args.length == 0) {
 					if (sender instanceof Player) {
-						if (plugin.adminchattoggle.get(sender.getName()).equalsIgnoreCase("on")) {
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.acprefix)+"Adminchat " + ChatColor.RED + "DISABLED");
-							plugin.adminchattoggle.put(sender.getName(), "off");
+						if (plugin.partyPlayer.get(name).getAToggle()) {
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', acprefix)+"Adminchat " + ChatColor.RED + "DISABLED");
+							plugin.partyPlayer.get(name).setAToggle(false);
 						} else {
-							plugin.adminchattoggle.put(sender.getName(),"on");
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&',OasisChat.acprefix)+ "Adminchat "+ ChatColor.GREEN+ "ENABLED");
+							plugin.partyPlayer.get(name).setAToggle(true);
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&',acprefix)+ "Adminchat "+ ChatColor.GREEN+ "ENABLED");
 						}
 					}
 				} else {
-					String prefix = ChatColor.translateAlternateColorCodes(
-							'&', OasisChat.acprefix)
-							+ "{"
-							+ ChatColor.translateAlternateColorCodes('&',
-									OasisChat.sncprefix)
-									+ sender.getName()
-									+ ChatColor.translateAlternateColorCodes('&',
-											OasisChat.acprefix) + "} ";
+					String prefix = acprefix + "{" + sncprefix + sender.getName() + acprefix + "} ";
 					StringBuffer buffer = new StringBuffer();
 					buffer.append(args[0]);
 
@@ -46,8 +43,7 @@ public class ACommand implements CommandExecutor {
 					}
 
 					String message = buffer.toString();
-					plugin.getServer().broadcast(prefix + ChatColor.translateAlternateColorCodes('&', message),
-							"oasischat.staff.a");
+					plugin.getServer().broadcast(ChatColor.translateAlternateColorCodes('&', prefix + message),"oasischat.staff.a");
 				}
 				return false;
 			}

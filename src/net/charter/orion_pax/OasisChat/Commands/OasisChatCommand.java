@@ -21,8 +21,6 @@ public class OasisChatCommand implements CommandExecutor {
 		this.plugin = plugin;
 	}
 	
-	CommandHelp helper = new CommandHelp(plugin);
-	
 	boolean disable = false;
 
 	@Override
@@ -30,20 +28,16 @@ public class OasisChatCommand implements CommandExecutor {
 		//Player player = (Player) sender;
 		
 		if (args.length == 0) {
-			sender.sendMessage(helper.oasischatsub);
+			sender.sendMessage(plugin.oasischatsub);
 			return true;
 		}
 		if (args[0].equalsIgnoreCase("save")) {
-			plugin.partytask.cancel();
 			plugin.saveConfig();
-			plugin.partytask.runTaskTimer(plugin, 10, 12000);
 			sender.sendMessage(ChatColor.GOLD + "Config Saved!");
 			return true;
 		}
 		if (args[0].equalsIgnoreCase("reload")) {
-			plugin.partytask.cancel();
 			plugin.reloadConfig();
-			plugin.partytask.runTaskTimer(plugin, 10, 12000);
 			plugin.setup();
 			sender.sendMessage(ChatColor.GOLD + "Config reloaded!");
 			return true;
@@ -79,7 +73,7 @@ public class OasisChatCommand implements CommandExecutor {
 				return true;
 			}
 		}
-		sender.sendMessage(helper.oasischatsub);
+		sender.sendMessage(plugin.oasischatsub);
 		return false;
 	}
 

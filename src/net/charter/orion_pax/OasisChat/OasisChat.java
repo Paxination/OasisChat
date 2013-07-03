@@ -1,13 +1,13 @@
 package net.charter.orion_pax.OasisChat;
 
 
-import java.io.File;
 import java.util.*;
+
 import net.charter.orion_pax.OasisChat.Commands.*;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -16,30 +16,48 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class OasisChat extends JavaPlugin {
 
 	public ConsoleCommandSender console;
-	public HashMap<String, String> adminchattoggle = new HashMap<String, String>();
-	public HashMap<String, String> partychattoggle = new HashMap<String, String>();
-	public HashMap<String, String> partyhash = new HashMap<String, String>();
-	public HashMap<String, String> invite = new HashMap<String, String>();
-	public HashMap<String, String> partyspy = new HashMap<String, String>();
-	public HashMap<String,PermissionAttachment> perms = new HashMap<String,PermissionAttachment>();
+	public final HashMap<String, Parties> MyParties = new HashMap<String, Parties>();
+	public final HashMap<String, PartyPlayer> partyPlayer = new HashMap<String, PartyPlayer>();
 	String aquaprefix = (char)27+"[1;36m";
 	String aquasufix = (char)27+"[22;39m";
 	String greenprefix = (char)27+"[1;32m";
 	String greensufix = (char)27+"[22;39m";
-	public static String pcprefix; //PartyChat Color prefix
-	public static String pncprefix; //PlayerName Color prefix
-	public static String sncprefix; //StaffNameChat Color prefix
-	public static String acprefix; //AdminChat Color prefix
-	public boolean disable = false;
-	File file = new File("plugins/OasisChat/paxserrorlog.txt");
+	public String pcprefix; //PartyChat Color prefix
+	public String pncprefix; //PlayerName Color prefix
+	public String sncprefix; //StaffNameChat Color prefix
+	public String acprefix; //AdminChat Color prefix
+	public MyConfigFile partyconfig;
+	
+	public String[] oasischatsub = {
+			ChatColor.GOLD + "Usage: /oasischat subcommand [args]"
+			,ChatColor.GOLD + "SubCommands:"
+			,ChatColor.GOLD + "SAVE - Saves config"
+			,ChatColor.GOLD + "RELOAD - Reloads config"
+			,ChatColor.GOLD + "LIST - List settings that can be changed in game"
+			,ChatColor.GOLD + "SET - Sets in game settings for oasischat"
+			,ChatColor.GOLD + "DEBUG - turns on debug."
+	};
+	
+	public String[] partychatsub = {
+			ChatColor.translateAlternateColorCodes('&', pcprefix + "Usage: /party subcommand [args]")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "SubCommands:")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "CREATE partyname password (password optional)")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "JOIN partyname password (password option)")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "INVITE playername - invites player to partychat")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "ACCEPT - accepts invite, 5 min time limit")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "KICK playername")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "List - list members of your party")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "PASSWORD password")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "GIVE playername")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "QUIT - quits current party chat")
+	};
 
-	public PartyChat party = new PartyChat(this);
+	//public PartyChat party = new PartyChat(this);
 	OasisChatListener ChatListener = new OasisChatListener(this);
 
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
-		setupconfig();
 		setup();
 		Bukkit.getPluginManager().registerEvents(new OasisChatListener(this), this);
 		getCommand("a").setExecutor(new ACommand(this));
@@ -54,7 +72,8 @@ public class OasisChat extends JavaPlugin {
 		getCommand("partyinfo").setExecutor(new PartyinfoCommand(this));
 		getCommand("credits").setExecutor(new CreditsCommand(this));
 		console = Bukkit.getServer().getConsoleSender();
-		partytask.runTaskTimer(this, 10, 12000);
+		partyconfig = new MyConfigFile(this, "partychat.yml");
+		this.partyconfig.saveDefaultConfig();
 		getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
 	}
 
@@ -64,13 +83,6 @@ public class OasisChat extends JavaPlugin {
 		getLogger().info(aquaprefix+"OasisChat has been disabled!"+aquasufix);
 	}
 
-	public void setupconfig(){
-		if (!(getConfig().contains("partychats"))){
-			getConfig().createSection("partychats");
-			saveConfig();
-		}
-	}
-
 	public void setup(){
 		acprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("adminchatcolor");
 		pcprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("partychatcolor");
@@ -78,38 +90,35 @@ public class OasisChat extends JavaPlugin {
 		pncprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("playernamechatcolor");
 	}
 	
-	BukkitRunnable partychat = new BukkitRunnable(){
-		@Override
-		public void run(){
-			
-		}
-	};
-
-	public BukkitRunnable partytask = new BukkitRunnable(){
-		@Override
-		public void run(){
-			boolean needreset = false;
-			Set<String> parties = party.getParties();
-			if (parties==null){return;}
-			for (String thisparty : parties){
-				if (!getConfig().contains("partychats." + thisparty + ".owner")){
-					getConfig().set("partychats." + thisparty, null);
-					needreset = true;
-				}
-				if (!getConfig().contains("partychats." + thisparty + ".password")){
-					getConfig().set("partychats." + thisparty, null);
-					needreset = true;
-				}
-				if (!getConfig().contains("partychats." + thisparty + ".members")){
-					getConfig().set("partychats." + thisparty, null);
-					needreset = true;
-				}
+//	BukkitRunnable partychat = new BukkitRunnable(){
+//		@Override
+//		public void run(){
+//			
+//		}
+//	};
+	
+	public void loadParties(){
+		Set<String> parties = this.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
+		if (parties!=null){
+			for (String party : parties){
+				String owner = this.partyconfig.getConfig().getString("partychats." + party + ".owner");
+				String password = this.partyconfig.getConfig().getString("partychats." + party + ".password");
+				List<String> members = this.partyconfig.getConfig().getStringList("partychats." + party + ".members");
+				this.MyParties.put(party, new Parties(this, owner,party,password,members));
 			}
-			if (needreset){
-				party.resetchats();
-			}
-			saveConfig();
 		}
-	};
-
+	}
+	
+	public void saveParties(){
+		Iterator it = this.MyParties.entrySet().iterator();
+		while (it.hasNext()){
+			Map.Entry entry = (Map.Entry)it.next();
+			Parties party = (Parties) entry.getValue();
+			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".owner", party.getOwner());
+			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".password", party.getPassword());
+			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".members", party.getMembers());
+			it.remove();
+		}
+		this.partyconfig.saveConfig();
+	}
 }

@@ -1,5 +1,6 @@
 package net.charter.orion_pax.OasisChat.Commands;
 
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
@@ -19,8 +20,8 @@ public class ListpartiesCommand implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		Set<String> parties = plugin.getConfig().getConfigurationSection("partychats").getKeys(false);
-		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', OasisChat.pcprefix) + parties.toString());
+		List<String> parties = (List<String>) plugin.getConfig().getConfigurationSection("partychats").getKeys(false);
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + parties.toString()));
 		return true;
 	}
 }

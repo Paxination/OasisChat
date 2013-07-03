@@ -19,7 +19,7 @@ public class StaffCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		sender.sendMessage(ChatColor.translateAlternateColorCodes(
-				'&', OasisChat.acprefix) + "[STAFF ONLINE]");
+				'&', plugin.acprefix) + "[STAFF ONLINE]");
 		Player[] onlinePlayers = Bukkit.getServer()
 				.getOnlinePlayers();
 		for (Player oplayer : onlinePlayers) {
@@ -27,7 +27,7 @@ public class StaffCommand implements CommandExecutor {
 					&& (oplayer.hasPermission("OasisChat.staff.a"))) {
 				sender.sendMessage(ChatColor
 						.translateAlternateColorCodes('&',
-								OasisChat.acprefix)
+								plugin.acprefix)
 								+ oplayer.getName());
 			}
 		}
