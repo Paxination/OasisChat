@@ -22,6 +22,7 @@ public class Parties {
 		this.myparty = myparty;
 		this.password = password;
 		this.members = members;
+		plugin.partyPlayer.get(owner).changeParty(myparty);
 	}
 	
 	public void addMember(String name){

@@ -20,11 +20,12 @@ public class OasisChatListener implements Listener{
 		this.plugin = plugin;
 	}
 
+	private Map<String, PartyPlayer> syncPartyPlayer;
 	
 
 	@EventHandler
 	public void OnAsyncPlayerChat(AsyncPlayerChatEvent event) {
-		Map<String, PartyPlayer> syncPartyPlayer = Collections.synchronizedMap(plugin.partyPlayer);
+		syncPartyPlayer = Collections.synchronizedMap(plugin.partyPlayer);
 		String name = event.getPlayer().getName();
 		String acprefix = plugin.acprefix;
 		String pcprefix = plugin.pcprefix;
@@ -73,7 +74,7 @@ public class OasisChatListener implements Listener{
 	@EventHandler
 	public void OnPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		plugin.partyPlayer.put(player.getName(), new PartyPlayer(plugin,player));
+		plugin.partyPlayer.put(player.getName(), new PartyPlayer(plugin,player.getName()));
 	}
 
 	@EventHandler

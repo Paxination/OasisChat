@@ -16,8 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class OasisChat extends JavaPlugin {
 
 	public ConsoleCommandSender console;
-	public final HashMap<String, Parties> MyParties = new HashMap<String, Parties>();
-	public final HashMap<String, PartyPlayer> partyPlayer = new HashMap<String, PartyPlayer>();
+	public HashMap<String, Parties> MyParties = new HashMap<String, Parties>();
+	public HashMap<String, PartyPlayer> partyPlayer = new HashMap<String, PartyPlayer>();
 	String aquaprefix = (char)27+"[1;36m";
 	String aquasufix = (char)27+"[22;39m";
 	String greenprefix = (char)27+"[1;32m";
@@ -30,7 +30,7 @@ public class OasisChat extends JavaPlugin {
 	
 	public String[] oasischatsub = {
 			ChatColor.GOLD + "Usage: /oasischat subcommand [args]"
-			,ChatColor.GOLD + "SubCommands:"
+			,ChatColor.GOLD + "net.charter.orion_pax.OasisChat.SubCommands:"
 			,ChatColor.GOLD + "SAVE - Saves config"
 			,ChatColor.GOLD + "RELOAD - Reloads config"
 			,ChatColor.GOLD + "LIST - List settings that can be changed in game"
@@ -40,7 +40,7 @@ public class OasisChat extends JavaPlugin {
 	
 	public String[] partychatsub = {
 			ChatColor.translateAlternateColorCodes('&', pcprefix + "Usage: /party subcommand [args]")
-			,ChatColor.translateAlternateColorCodes('&', pcprefix + "SubCommands:")
+			,ChatColor.translateAlternateColorCodes('&', pcprefix + "net.charter.orion_pax.OasisChat.SubCommands:")
 			,ChatColor.translateAlternateColorCodes('&', pcprefix + "CREATE partyname password (password optional)")
 			,ChatColor.translateAlternateColorCodes('&', pcprefix + "JOIN partyname password (password option)")
 			,ChatColor.translateAlternateColorCodes('&', pcprefix + "INVITE playername - invites player to partychat")
@@ -74,13 +74,14 @@ public class OasisChat extends JavaPlugin {
 		console = Bukkit.getServer().getConsoleSender();
 		partyconfig = new MyConfigFile(this, "partychat.yml");
 		this.partyconfig.saveDefaultConfig();
+		this.partyconfig.reloadConfig();
 		getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
 	}
 
 	@Override
 	public void onDisable(){
 		this.saveConfig();
-		this.partyconfig.saveConfig();
+		this.saveParties();
 		getLogger().info(aquaprefix+"OasisChat has been disabled!"+aquasufix);
 	}
 

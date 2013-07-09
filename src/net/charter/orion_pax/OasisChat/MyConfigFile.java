@@ -26,11 +26,11 @@ public class MyConfigFile {
 		File dataFolder = plugin.getDataFolder();
 		if (dataFolder == null)
 			throw new IllegalStateException();
-		this.configFile = new File(plugin.getDataFolder(), this.fileName);
+		this.configFile = new File(plugin.getDataFolder(), fileName);
+		fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
 	}
 
 	public void reloadConfig() {
-		fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
 
 		// Look for defaults in the jar
 		InputStream defConfigStream = plugin.getResource(fileName);

@@ -21,7 +21,7 @@ public class PCommand implements CommandExecutor {
 		Player player = (Player) sender;
 		String name = player.getName();
 		String myparty = null;
-		if (plugin.partyPlayer.containsKey(name)){
+		if (plugin.partyPlayer.get(name).getMyParty()!=null){
 			myparty = plugin.partyPlayer.get(name).getMyParty();
 		}
 		String pcprefix = plugin.pcprefix;

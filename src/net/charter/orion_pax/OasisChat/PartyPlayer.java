@@ -8,10 +8,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public class PartyPlayer {
+public final class PartyPlayer {
 
 	private OasisChat plugin;
-	private Player player;
 	private String name;
 	private String myparty;
 	private boolean partytoggle;
@@ -20,16 +19,15 @@ public class PartyPlayer {
 	private String partyspychat;
 	private String invite;
 	
-	public PartyPlayer(OasisChat plugin, Player player){
+	public PartyPlayer(OasisChat plugin, String name){
 		this.plugin = plugin;
-		this.player = player;
-		this.name = player.getName();
+		this.name = name;
 		this.myparty = getMyParty();
 		this.partytoggle = false;
 		this.admintoggle = false;
 		this.partyspychat = "";
 		this.invite = "";
-		if (!player.hasPermission("oasischat.staff.a")){
+		if (!plugin.getServer().getPlayer(name).getPlayer().hasPermission("oasischat.staff.a")){
 			this.staff = false;
 		} else {
 			this.staff = true;
@@ -53,7 +51,7 @@ public class PartyPlayer {
 	}
 	
 	public void sendMessage(String msg){
-		player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+		plugin.getServer().getPlayer(name).sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 	}
 	
 	public String getMyParty(){
