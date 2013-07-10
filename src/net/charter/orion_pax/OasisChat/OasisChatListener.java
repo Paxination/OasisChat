@@ -1,6 +1,7 @@
 package net.charter.orion_pax.OasisChat;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +22,7 @@ public class OasisChatListener implements Listener{
 	}
 
 	private Map<String, PartyPlayer> syncPartyPlayer;
-	
+
 
 	@EventHandler
 	public void OnAsyncPlayerChat(AsyncPlayerChatEvent event) {
@@ -31,7 +32,7 @@ public class OasisChatListener implements Listener{
 		String pcprefix = plugin.pcprefix;
 		String sncprefix = plugin.sncprefix;
 		String pncprefix = plugin.pncprefix;
-		
+
 		synchronized (syncPartyPlayer) {
 			if (syncPartyPlayer.containsKey(name)) {
 				if (syncPartyPlayer.get(name).isStaff()) {
@@ -40,11 +41,9 @@ public class OasisChatListener implements Listener{
 						Iterator it = syncPartyPlayer.entrySet().iterator();
 						while (it.hasNext()){
 							Map.Entry entry = (Map.Entry) it.next();
-							PartyPlayer partyplayer = (PartyPlayer) entry.getValue();
-							if (partyplayer.isStaff()){
-								partyplayer.sendMessage(thismsg);
+							if (syncPartyPlayer.get(entry.getKey()).isStaff()){
+								syncPartyPlayer.get(entry.getKey()).sendMessage(thismsg);
 							}
-							it.remove();
 						}
 						plugin.console.sendMessage(ChatColor.translateAlternateColorCodes('&', thismsg));
 						event.setCancelled(true);
@@ -57,11 +56,9 @@ public class OasisChatListener implements Listener{
 						Iterator it = syncPartyPlayer.entrySet().iterator();
 						while (it.hasNext()){
 							Map.Entry entry = (Map.Entry)it.next();
-							PartyPlayer partyplayer = (PartyPlayer) entry.getValue();
-							if (partyplayer.getMyParty().equals(syncPartyPlayer.get(name).getMyParty())){
-								partyplayer.sendMessage(prefix + event.getMessage());
+							if (syncPartyPlayer.get(entry.getKey()).getMyParty().equals(syncPartyPlayer.get(name).getMyParty())){
+								syncPartyPlayer.get(entry.getKey()).sendMessage(prefix + event.getMessage());
 							}
-							it.remove();
 						}
 						event.setCancelled(true);
 						return;
@@ -97,7 +94,7 @@ public class OasisChatListener implements Listener{
 		if (event.getDamager() instanceof Player && event.getEntity() instanceof Player){
 			attacker = (Player) event.getDamager();
 			defender = (Player) event.getEntity();
-			if (plugin.partyPlayer.get(attacker.getName()).getMyParty().equals(plugin.partyPlayer.get(defender.getName()).getMyParty())){
+			if (plugin.partyPlayer.get(attacker.getName()).myParty().equals(plugin.partyPlayer.get(defender.getName()).myParty())){
 				event.setCancelled(true);
 			}
 		}

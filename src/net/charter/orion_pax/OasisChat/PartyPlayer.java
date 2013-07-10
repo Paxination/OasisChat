@@ -27,10 +27,10 @@ public final class PartyPlayer {
 		this.admintoggle = false;
 		this.partyspychat = "";
 		this.invite = "";
-		if (!plugin.getServer().getPlayer(name).getPlayer().hasPermission("oasischat.staff.a")){
-			this.staff = false;
-		} else {
+		if (plugin.getServer().getPlayer(name).getPlayer().hasPermission("oasischat.staff.a")){
 			this.staff = true;
+		} else {
+			this.staff = false;
 		}
 	}
 	
@@ -60,16 +60,17 @@ public final class PartyPlayer {
 			Map.Entry entry = (Map.Entry) it.next();
 			Parties party = (Parties) entry.getValue();
 			if (party.getMembers().contains(this.name)){
-				this.myparty=(String) entry.getKey();
-				return this.myparty;
+				return (String) entry.getKey();
 			}
 			if (party.getOwner().equals(this.name)){
-				this.myparty=(String) entry.getKey();
-				return this.myparty;
+				return (String) entry.getKey();
 			}
-			it.remove();
 		}
 		return null;
+	}
+	
+	public String myParty(){
+		return this.myparty;
 	}
 	
 	public void removeParty(){

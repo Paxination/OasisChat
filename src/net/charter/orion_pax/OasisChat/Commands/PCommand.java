@@ -21,8 +21,8 @@ public class PCommand implements CommandExecutor {
 		Player player = (Player) sender;
 		String name = player.getName();
 		String myparty = null;
-		if (plugin.partyPlayer.get(name).getMyParty()!=null){
-			myparty = plugin.partyPlayer.get(name).getMyParty();
+		if (plugin.partyPlayer.get(name).myParty()!=null){
+			myparty = plugin.partyPlayer.get(name).myParty();
 		}
 		String pcprefix = plugin.pcprefix;
 		String pncprefix = plugin.pncprefix;
@@ -54,7 +54,6 @@ public class PCommand implements CommandExecutor {
 				}
 
 				String message = buffer.toString();
-				plugin.console.sendMessage(ChatColor.translateAlternateColorCodes('&', prefix + message));
 				plugin.MyParties.get(myparty).sendMessage(prefix + message);
 			}
 		}

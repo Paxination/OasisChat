@@ -35,9 +35,12 @@ public class PartyCommand implements CommandExecutor {
 		}
 		
 		Player player = (Player) sender;
-		String myparty = plugin.partyPlayer.get(player.getName()).getMyParty();
 		String name = player.getName();
 		String password = "";
+		String myparty = null;
+		if (plugin.partyPlayer.get(name).myParty()!=null){
+			myparty = plugin.partyPlayer.get(name).myParty();
+		}
 		
 		if (args[0].equalsIgnoreCase("create")) {
 			if (args.length > 1) {
@@ -55,10 +58,16 @@ public class PartyCommand implements CommandExecutor {
 						plugin.MyParties.get(myparty).removeMember(name);
 					}
 				}
-				plugin.MyParties.put(args[1], new Parties(plugin, name, args[1], password, null));
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix)+ args[1]+ " has been created!");
-				plugin.saveParties();
-				return true;
+				if (!plugin.MyParties.containsKey(args[1])) {
+					plugin.MyParties.put(args[1], new Parties(plugin, name, args[1], password, null));
+					plugin.partyPlayer.get(name).changeParty(args[1]);
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + args[1] + " has been created!");
+					plugin.saveParties();
+					return true;
+				} else {
+					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + args[1] + " already exist!"));
+					return true;
+				}
 			} else {
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix)+ "Usage: /party create <partyname> <password> (password is optional)");
 				return true;
@@ -122,18 +131,13 @@ public class PartyCommand implements CommandExecutor {
 								return true;
 							}
 						}
-						if (target != null) {
-							if (plugin.MyParties.get(myparty).getMembers().contains(target.getName())) {
-								plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + target.getName() + " has been kicked from " + myparty + "!");
-								plugin.MyParties.get(myparty).removeMember(target.getName());
-								plugin.saveParties();
-								return true;
-							} else {
-								sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + target.getName() + " is not a member of your party!");
-								return true;
-							}
+						if (plugin.MyParties.get(myparty).getMembers().contains(target.getName())) {
+							plugin.MyParties.get(myparty).sendMessage(plugin.pcprefix + target.getName() + " has been kicked from " + myparty + "!");
+							plugin.MyParties.get(myparty).removeMember(target.getName());
+							plugin.saveParties();
+							return true;
 						} else {
-							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + args[1] + " is not online!"));
+							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + target.getName() + " is not a member of your party!");
 							return true;
 						}
 					}
@@ -233,7 +237,6 @@ public class PartyCommand implements CommandExecutor {
 					if (partyplayer.getMyParty().equals(myparty)){
 						mlist.add(partyplayer.getName());
 					}
-					it.remove();
 				}
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Online: " + mlist));
 				return true;
@@ -249,7 +252,6 @@ public class PartyCommand implements CommandExecutor {
 					if (partyplayer.getMyParty().equals(myparty)){
 						mlist.add(partyplayer.getName());
 					}
-					it.remove();
 				}
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Online: " + mlist));
 				return true;

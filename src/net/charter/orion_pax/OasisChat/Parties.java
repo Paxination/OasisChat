@@ -9,7 +9,7 @@ import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class Parties {
+public final class Parties {
 
 	private String owner;
 	private String myparty;
@@ -22,7 +22,6 @@ public class Parties {
 		this.myparty = myparty;
 		this.password = password;
 		this.members = members;
-		plugin.partyPlayer.get(owner).changeParty(myparty);
 	}
 	
 	public void addMember(String name){
@@ -62,12 +61,19 @@ public class Parties {
 	}
 	
 	public void sendMessage(String msg){
-		for (String member:members){
-			Player player = plugin.getServer().getPlayer(member);
-			if (player!=null){
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+		if (members!=null) {
+			for (String member : members) {
+				Player player = plugin.getServer().getPlayer(member);
+				if (player != null) {
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+				}
 			}
 		}
+		plugin.getLogger().info(myparty);
+		plugin.getLogger().info(password);
+		plugin.getLogger().info(owner);
+		plugin.getServer().getPlayer(owner).sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+		plugin.console.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 	}
 	
 	public void removeMembers(){

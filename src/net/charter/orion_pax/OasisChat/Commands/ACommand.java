@@ -24,18 +24,6 @@ public class ACommand implements CommandExecutor {
 				
 				if (args.length == 0) {
 					if (sender instanceof Player) {
-						if (plugin == null){
-							plugin.getLogger().info("PLUGIN");
-						}
-						if (plugin.partyPlayer==null){
-							plugin.getLogger().info("PARTYPLAYER");
-						}
-						if (name==null){
-							plugin.getLogger().info("name");
-						}
-						if (plugin.partyPlayer.get(name)==null){
-							plugin.getLogger().info("partyplayer.get(name)");
-						}
 						if (plugin.partyPlayer.get(name).getAToggle()) {
 							sender.sendMessage(ChatColor.translateAlternateColorCodes('&', acprefix)+"Adminchat " + ChatColor.RED + "DISABLED");
 							plugin.partyPlayer.get(name).setAToggle(false);

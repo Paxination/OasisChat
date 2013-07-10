@@ -75,6 +75,7 @@ public class OasisChat extends JavaPlugin {
 		partyconfig = new MyConfigFile(this, "partychat.yml");
 		this.partyconfig.saveDefaultConfig();
 		this.partyconfig.reloadConfig();
+		loadParties();
 		getLogger().info(aquaprefix+"OasisChat has been enabled!"+aquasufix);
 	}
 
@@ -92,16 +93,9 @@ public class OasisChat extends JavaPlugin {
 		pncprefix = this.getConfig().getConfigurationSection("ingameconfigurable").getString("playernamechatcolor");
 	}
 	
-//	BukkitRunnable partychat = new BukkitRunnable(){
-//		@Override
-//		public void run(){
-//			
-//		}
-//	};
-	
 	public void loadParties(){
-		Set<String> parties = this.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
-		if (parties!=null){
+		if (this.partyconfig.getConfig().contains("partychats")){
+			Set<String> parties = this.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
 			for (String party : parties){
 				String owner = this.partyconfig.getConfig().getString("partychats." + party + ".owner");
 				String password = this.partyconfig.getConfig().getString("partychats." + party + ".password");
@@ -119,7 +113,6 @@ public class OasisChat extends JavaPlugin {
 			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".owner", party.getOwner());
 			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".password", party.getPassword());
 			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".members", party.getMembers());
-			it.remove();
 		}
 		this.partyconfig.saveConfig();
 	}

@@ -13,15 +13,20 @@ import net.charter.orion_pax.OasisChat.OasisChat;
 public class ListpartiesCommand implements CommandExecutor {
 
 	private OasisChat plugin;
-	
+
 	public ListpartiesCommand(OasisChat plugin){
 		this.plugin = plugin;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		List<String> parties = (List<String>) plugin.getConfig().getConfigurationSection("partychats").getKeys(false);
-		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + parties.toString()));
-		return true;
+		if (plugin.partyconfig.getConfig().contains("partychats")) {
+			List<String> parties = (List<String>) plugin.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + parties.toString()));
+			return true;
+		} else {
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "No Parties defined yet!"));
+			return true;
+		}
 	}
 }
