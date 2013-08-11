@@ -39,15 +39,15 @@ public final class PartyPlayer {
 	}
 	
 	public boolean getPToggle(){
-		return this.partytoggle;
+		return partytoggle;
 	}
 	
 	public boolean isStaff(){
-		return this.staff;
+		return staff;
 	}
 	
 	public boolean getAToggle(){
-		return this.admintoggle;
+		return admintoggle;
 	}
 	
 	public void sendMessage(String msg){
@@ -59,10 +59,10 @@ public final class PartyPlayer {
 		while (it.hasNext()){
 			Map.Entry entry = (Map.Entry) it.next();
 			Parties party = (Parties) entry.getValue();
-			if (party.getMembers().contains(this.name)){
+			if (party.getMembers().contains(name)){
 				return (String) entry.getKey();
 			}
-			if (party.getOwner().equals(this.name)){
+			if (party.getOwner().equals(name)){
 				return (String) entry.getKey();
 			}
 		}
@@ -70,38 +70,38 @@ public final class PartyPlayer {
 	}
 	
 	public String myParty(){
-		return this.myparty;
+		return myparty;
 	}
 	
 	public void removeParty(){
-		this.myparty=null;
+		myparty=null;
 	}
 	
 	public void changeParty(String myparty){
-		this.myparty=myparty;
+		myparty=myparty;
 	}
 
 	public void setPToggle(boolean b) {
-		this.partytoggle = b;
+		partytoggle = b;
 	}
 
 	public void setAToggle(boolean b) {
-		this.admintoggle = b;
+		admintoggle = b;
 	}
 	
 	public void setPartySpyChat(String chat){
-		this.partyspychat = chat;
+		partyspychat = chat;
 	}
 	
 	public String getPartySpyChat(){
-		return this.partyspychat;
+		return partyspychat;
 	}
 
 	public void setInvite(String myparty) {
-		this.invite = myparty;
+		invite = myparty;
 	}
 	
 	public String getInvite(){
-		return this.invite;
+		return invite;
 	}
 }

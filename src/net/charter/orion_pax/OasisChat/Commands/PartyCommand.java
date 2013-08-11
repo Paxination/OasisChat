@@ -42,8 +42,8 @@ public class PartyCommand implements CommandExecutor {
 			myparty = plugin.partyPlayer.get(name).myParty();
 		}
 		
-		if (args[0].equalsIgnoreCase("create")) {
-			if (args.length > 1) {
+		if (args.length > 1) {
+			if (args[0].equalsIgnoreCase("create")) {
 				if (args.length == 3) {
 					password = args[2];
 				}
@@ -58,7 +58,7 @@ public class PartyCommand implements CommandExecutor {
 						plugin.MyParties.get(myparty).removeMember(name);
 					}
 				}
-				if (!plugin.MyParties.containsKey(args[1])) {
+				if (plugin.MyParties.containsKey(args[1])==false) {
 					plugin.MyParties.put(args[1], new Parties(plugin, name, args[1], password, null));
 					plugin.partyPlayer.get(name).changeParty(args[1]);
 					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix) + args[1] + " has been created!");

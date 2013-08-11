@@ -10,6 +10,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 
 
@@ -27,6 +30,11 @@ public class OasisChat extends JavaPlugin {
 	public String sncprefix; //StaffNameChat Color prefix
 	public String acprefix; //AdminChat Color prefix
 	public MyConfigFile partyconfig;
+	
+	ScoreboardManager PartyChat = Bukkit.getScoreboardManager();
+	Scoreboard SMPboard = PartyChat.getNewScoreboard();
+	Scoreboard PVPboard = PartyChat.getNewScoreboard();
+	Team staff = SMPboard.registerNewTeam("Staff");
 	
 	public String[] oasischatsub = {
 			ChatColor.GOLD + "Usage: /oasischat subcommand [args]"

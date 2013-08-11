@@ -21,7 +21,7 @@ public class ListpartiesCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (plugin.partyconfig.getConfig().contains("partychats")) {
-			List<String> parties = (List<String>) plugin.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
+			Set<String> parties = plugin.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
 			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + parties.toString()));
 			return true;
 		} else {
