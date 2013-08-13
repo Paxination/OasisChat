@@ -7,7 +7,6 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class MyConfigFile {
 
@@ -27,11 +26,18 @@ public class MyConfigFile {
 		if (dataFolder == null)
 			throw new IllegalStateException();
 		this.configFile = new File(plugin.getDataFolder(), fileName);
-		fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
+	}
+	
+	public boolean exist(){
+		if (configFile.exists()){
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public void reloadConfig() {
-
+		fileConfiguration = YamlConfiguration.loadConfiguration(configFile);
 		// Look for defaults in the jar
 		InputStream defConfigStream = plugin.getResource(fileName);
 		if (defConfigStream != null) {
@@ -49,12 +55,11 @@ public class MyConfigFile {
 
 	public void saveConfig() {
 		if (fileConfiguration == null || configFile == null) {
-			plugin.getLogger().info("SOMETHING WRONG");
+			plugin.getLogger().info("Config file is not set correctly!");
 			return;
 		} else {
 			try {
 				getConfig().save(configFile);
-				plugin.getLogger().info("CONFIG SAVED!");
 			} catch (IOException ex) {
 				plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
 			}

@@ -3,12 +3,15 @@ package net.charter.orion_pax.OasisChat.Commands;
 import java.awt.List;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 
 import net.charter.orion_pax.OasisChat.OasisChat;
 import net.charter.orion_pax.OasisChat.PartyPlayer;
@@ -28,38 +31,32 @@ public class PartyinfoCommand implements CommandExecutor {
 		String pcprefix = plugin.pcprefix;
 		
 		if (args.length == 1) {
-			if (plugin.MyParties.containsKey(args[0])) {
+			if (plugin.SMPboard.getTeam(args[0])!=null) {
+				Team thisteam = plugin.SMPboard.getTeam(args[0]);
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "PartyChat: " + args[0]));
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Owner: " + plugin.MyParties.get(args[0]).getOwner()));
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Password: " + plugin.MyParties.get(args[0]).getPassword()));
-				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Members: " + plugin.MyParties.get(args[0]).getMembers()));
-				Iterator it = plugin.partyPlayer.entrySet().iterator();
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Owner: " + plugin.MyParties2.get(thisteam)));
+				//sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Password: " + plugin.MyParties.get(args[0]).getPassword()));
+				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Members: " + thisteam.getPlayers().toString()));
 				List mlist = null;
-				while (it.hasNext()){
-					Map.Entry entry = (Map.Entry)it.next();
-					PartyPlayer partyplayer = (PartyPlayer) entry.getValue();
-					if (partyplayer.getMyParty().equals(args[0])){
-						mlist.add(partyplayer.getName());
+				for (OfflinePlayer teamplayer: thisteam.getPlayers()){
+					if (teamplayer.isOnline()){
+						mlist.add(teamplayer.getName());
 					}
-					it.remove();
 				}
 				sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Online: " + mlist));
 				return true;
 			}
-		} else if (plugin.partyPlayer.get(name).getPartySpyChat()!="") {
-			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "PartyChat: " + plugin.partyPlayer.get(name).getPartySpyChat()));
-			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Owner: " + plugin.MyParties.get(plugin.partyPlayer.get(name).getPartySpyChat()).getOwner()));
-			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Password: " + plugin.MyParties.get(plugin.partyPlayer.get(name).getPartySpyChat()).getPassword()));
-			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Members: " + plugin.MyParties.get(plugin.partyPlayer.get(name).getPartySpyChat()).getMembers()));
-			Iterator it = plugin.partyPlayer.entrySet().iterator();
+		} else if (plugin.partyPlayer.get(name).getPartySpyChat()!=null) {
+			Team thisteam=plugin.partyPlayer.get(name).getPartySpyChat();
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "PartyChat: " + args[0]));
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Owner: " + plugin.MyParties2.get(thisteam)));
+			//sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Password: " + plugin.MyParties.get(args[0]).getPassword()));
+			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Members: " + thisteam.getPlayers().toString()));
 			List mlist = null;
-			while (it.hasNext()){
-				Map.Entry entry = (Map.Entry)it.next();
-				PartyPlayer partyplayer = (PartyPlayer) entry.getValue();
-				if (partyplayer.getMyParty().equals(plugin.partyPlayer.get(name).getPartySpyChat())){
-					mlist.add(partyplayer.getName());
+			for (OfflinePlayer teamplayer: thisteam.getPlayers()){
+				if (teamplayer.isOnline()){
+					mlist.add(teamplayer.getName());
 				}
-				it.remove();
 			}
 			sender.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.pcprefix + "Online: " + mlist));
 			return true;

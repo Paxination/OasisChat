@@ -5,8 +5,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 
 import net.charter.orion_pax.OasisChat.OasisChat;
+import net.charter.orion_pax.OasisChat.PartyPlayer;
 
 public class PCommand implements CommandExecutor {
 
@@ -20,9 +22,10 @@ public class PCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Player player = (Player) sender;
 		String name = player.getName();
-		String myparty = null;
-		if (plugin.partyPlayer.get(name).myParty()!=null){
-			myparty = plugin.partyPlayer.get(name).myParty();
+		Team myparty = null;
+		PartyPlayer mypartyplayer = plugin.partyPlayer.get(name);
+		if (mypartyplayer.getMyParty()!=null){
+			myparty = plugin.partyPlayer.get(name).getMyParty();
 		}
 		String pcprefix = plugin.pcprefix;
 		String pncprefix = plugin.pncprefix;
@@ -44,7 +47,7 @@ public class PCommand implements CommandExecutor {
 			}
 		} else {
 			if (myparty!=null) {
-				String prefix = pcprefix + "<" + pncprefix + myparty + pcprefix + "> - " + pncprefix + sender.getName() + pcprefix + ": ";
+				String prefix = pcprefix + "<" + pncprefix + myparty.getName() + pcprefix + "> - " + pncprefix + sender.getName() + pcprefix + ": ";
 				StringBuffer buffer = new StringBuffer();
 				buffer.append(args[0]);
 
@@ -54,7 +57,7 @@ public class PCommand implements CommandExecutor {
 				}
 
 				String message = buffer.toString();
-				plugin.MyParties.get(myparty).sendMessage(prefix + message);
+				mypartyplayer.sendTeamChat(prefix + message);
 			}
 		}
 		return false;

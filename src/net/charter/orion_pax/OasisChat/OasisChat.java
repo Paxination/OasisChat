@@ -19,8 +19,10 @@ import org.bukkit.scoreboard.Team;
 public class OasisChat extends JavaPlugin {
 
 	public ConsoleCommandSender console;
-	public HashMap<String, Parties> MyParties = new HashMap<String, Parties>();
+	//public HashMap<String, Parties> MyParties = new HashMap<String, Parties>();
 	public HashMap<String, PartyPlayer> partyPlayer = new HashMap<String, PartyPlayer>();
+	public HashMap<Team, String> MyParties2 = new HashMap<Team, String>();
+	public HashMap<Team, String> SpyChat = new HashMap<Team, String>();
 	String aquaprefix = (char)27+"[1;36m";
 	String aquasufix = (char)27+"[22;39m";
 	String greenprefix = (char)27+"[1;32m";
@@ -31,10 +33,8 @@ public class OasisChat extends JavaPlugin {
 	public String acprefix; //AdminChat Color prefix
 	public MyConfigFile partyconfig;
 	
-	ScoreboardManager PartyChat = Bukkit.getScoreboardManager();
-	Scoreboard SMPboard = PartyChat.getNewScoreboard();
-	Scoreboard PVPboard = PartyChat.getNewScoreboard();
-	Team staff = SMPboard.registerNewTeam("Staff");
+	public ScoreboardManager PartyChat = Bukkit.getScoreboardManager();
+	public Scoreboard SMPboard = PartyChat.getNewScoreboard();
 	
 	public String[] oasischatsub = {
 			ChatColor.GOLD + "Usage: /oasischat subcommand [args]"
@@ -102,26 +102,10 @@ public class OasisChat extends JavaPlugin {
 	}
 	
 	public void loadParties(){
-		if (this.partyconfig.getConfig().contains("partychats")){
-			Set<String> parties = this.partyconfig.getConfig().getConfigurationSection("partychats").getKeys(false);
-			for (String party : parties){
-				String owner = this.partyconfig.getConfig().getString("partychats." + party + ".owner");
-				String password = this.partyconfig.getConfig().getString("partychats." + party + ".password");
-				List<String> members = this.partyconfig.getConfig().getStringList("partychats." + party + ".members");
-				this.MyParties.put(party, new Parties(this, owner,party,password,members));
-			}
-		}
+		need to redo this method!
 	}
 	
 	public void saveParties(){
-		Iterator it = this.MyParties.entrySet().iterator();
-		while (it.hasNext()){
-			Map.Entry entry = (Map.Entry)it.next();
-			Parties party = (Parties) entry.getValue();
-			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".owner", party.getOwner());
-			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".password", party.getPassword());
-			this.partyconfig.getConfig().set("partychats."+entry.getKey()+".members", party.getMembers());
-		}
-		this.partyconfig.saveConfig();
+		need to redo this method!
 	}
 }

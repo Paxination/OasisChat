@@ -3,20 +3,22 @@ package net.charter.orion_pax.OasisChat;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 
 public final class PartyPlayer {
 
 	private OasisChat plugin;
 	private String name;
-	private String myparty;
+	private Team myparty;
 	private boolean partytoggle;
 	private boolean admintoggle;
 	private boolean staff;
-	private String partyspychat;
+	private Team partyspychat;
 	private String invite;
 	
 	public PartyPlayer(OasisChat plugin, String name){
@@ -25,7 +27,7 @@ public final class PartyPlayer {
 		this.myparty = getMyParty();
 		this.partytoggle = false;
 		this.admintoggle = false;
-		this.partyspychat = "";
+		this.partyspychat = null;
 		this.invite = "";
 		if (plugin.getServer().getPlayer(name).getPlayer().hasPermission("oasischat.staff.a")){
 			this.staff = true;
@@ -54,31 +56,38 @@ public final class PartyPlayer {
 		plugin.getServer().getPlayer(name).sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 	}
 	
-	public String getMyParty(){
-		Iterator it = plugin.MyParties.entrySet().iterator();
-		while (it.hasNext()){
-			Map.Entry entry = (Map.Entry) it.next();
-			Parties party = (Parties) entry.getValue();
-			if (party.getMembers().contains(name)){
-				return (String) entry.getKey();
+	public void sendTeamChat(String msg){
+		for (OfflinePlayer Oplayer : myparty.getPlayers()){
+			if (Oplayer.isOnline()) {
+				Player player = (Player) Oplayer;
+				player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 			}
-			if (party.getOwner().equals(name)){
-				return (String) entry.getKey();
+		}
+	}
+	
+	public Team getMyParty(){
+		Set<Team> teams = plugin.SMPboard.getTeams();
+		for(Team myteam : teams){
+			if (myteam.hasPlayer(plugin.getServer().getOfflinePlayer(name))){
+				return myteam;
 			}
 		}
 		return null;
 	}
 	
-	public String myParty(){
-		return myparty;
-	}
-	
 	public void removeParty(){
-		myparty=null;
+		if (myparty.hasPlayer(plugin.getServer().getOfflinePlayer(name))) {
+			myparty.removePlayer(plugin.getServer().getOfflinePlayer(name));
+			myparty = null;
+		}
 	}
 	
-	public void changeParty(String myparty){
-		myparty=myparty;
+	public void changeParty(Team myparty){
+		if (this.myparty!=null) {
+			this.myparty.removePlayer(plugin.getServer().getOfflinePlayer(name));
+		}
+		this.myparty = myparty;
+		myparty.addPlayer(plugin.getServer().getOfflinePlayer(name));
 	}
 
 	public void setPToggle(boolean b) {
@@ -89,11 +98,11 @@ public final class PartyPlayer {
 		admintoggle = b;
 	}
 	
-	public void setPartySpyChat(String chat){
-		partyspychat = chat;
+	public void setPartySpyChat(Team spyteam){
+		partyspychat = spyteam;
 	}
 	
-	public String getPartySpyChat(){
+	public Team getPartySpyChat(){
 		return partyspychat;
 	}
 
