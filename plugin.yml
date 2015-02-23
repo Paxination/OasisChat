@@ -12,6 +12,7 @@ commands:
     
   p:
     description: Party chat
+    aliases: [pc, pchat, pp]
     usage:
     permission: oasischat.players.p
     permission-message: You don't have permissions for <permission>
